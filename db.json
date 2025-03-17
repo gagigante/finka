@@ -1,0 +1,52 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "assign": {
+        "id": "1",
+        "name": "Gabriel Gigante",
+        "avatar": "https://avatars.githubusercontent.com/u/48386738?v=4"
+      },
+      "title": "task title",
+      "labels": [
+        {
+          "id": "1",
+          "name": "Documentation"
+        }
+      ],
+      "customer": {
+        "id": "1",
+        "name": "Gabriel Gigante"
+      },
+      "priority": "low",
+      "status": "in_progress",
+      "created_at": "2025-03-11T16:45:19.389Z",
+      "updated_at": "2025-03-11T16:45:19.389Z",
+      "finished_at": "2025-03-11T16:45:19.389Z"
+    },
+    {
+      "id": "2",
+      "assign": {
+        "id": "2",
+        "name": "Edson Santos",
+        "avatar": null
+      },
+      "title": "task title",
+      "labels": [
+        {
+          "id": "2",
+          "name": "Feature"
+        }
+      ],
+      "customer": {
+        "id": "2",
+        "name": "Edson Santos"
+      },
+      "priority": "low",
+      "status": "todo",
+      "created_at": "2025-03-11T16:45:19.389Z",
+      "updated_at": "2025-03-11T16:45:19.389Z",
+      "finished_at": "2025-03-11T16:45:19.389Z"
+    }
+  ]
+}

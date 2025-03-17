@@ -16,7 +16,7 @@ export function Providers({ children }: ProvidersProps) {
     defaultOptions: {
       queries: {
         staleTime: 5 * 1000,
-        refetchInterval: 2000,
+        // refetchInterval: 2000,
       },
     },
   }))
