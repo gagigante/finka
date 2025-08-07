@@ -101,7 +101,7 @@ export function TaskTableToolbar() {
           className="h-8"
           asChild
         >
-          <Link href="new">
+          <Link href="/new">
             <PlusCircle />
             Adicionar tarefa
           </Link>
@@ -113,7 +113,7 @@ export function TaskTableToolbar() {
           className="h-8"
           asChild
         >
-          <Link href="customers">
+          <Link href="/customers">
             <UserCircle />
             Clientes
           </Link>
@@ -125,7 +125,7 @@ export function TaskTableToolbar() {
           className="h-8"
           asChild
         >
-          <Link href="labels">
+          <Link href="/labels">
             <Tag />
             Etiquetas
           </Link>

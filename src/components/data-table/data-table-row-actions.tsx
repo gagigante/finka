@@ -1,7 +1,7 @@
 "use client"
 
 import { Row } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Paperclip, UserPlus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -28,7 +28,14 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[200px]">
+        <DropdownMenuItem>
+          <UserPlus className="mr-2 h-4 w-4" /> Atribuir responsável
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Paperclip className="mr-2 h-4 w-4" /> Adicionar anexo
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
         <DropdownMenuItem>Editar</DropdownMenuItem>
         <DropdownMenuSeparator />

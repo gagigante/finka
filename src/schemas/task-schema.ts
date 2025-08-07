@@ -21,8 +21,8 @@ export const taskSchema = z.object({
   priority: z.string(),
   status: z.string(),
   created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
-  finished_at: z.string().datetime(),
+  updated_at: z.string().datetime().optional().nullable(),
+  finished_at: z.string().datetime().optional().nullable(),
 })
 
 export type Task = z.infer<typeof taskSchema>

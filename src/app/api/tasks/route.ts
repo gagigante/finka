@@ -1,3 +1,4 @@
+// TODO: Migrar este endpoint para Convex (queries/mutations reais) e remover json-server.
 export async function GET() { 
   const response = await fetch('http://localhost:3001/tasks')
 
@@ -8,32 +9,17 @@ export async function GET() {
   return Response.json(data)
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const payload = await request.json()
+
   const res = await fetch('http://localhost:3001/tasks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(
-      {
-        "id": "TASK-8782",
-        "assign": {
-          "id": "1",
-          "name": "Gabriel Gigante",
-          "avatar": "https://avatars.githubusercontent.com/u/48386738?v=4"
-        },
-        "title": "teste",
-        "customer": {
-          "id": "1",
-          "name": "Gabriel Gigante"
-        },
-        "status": "todo",
-        "label": "documentation",
-        "priority": "low",
-        "created_at": "2025-03-11T16:45:19.389Z"
-      },
-    )
+    body: JSON.stringify({ ...payload }),
   })
 
   if (!res.ok) throw new Error('Failed to add todo')
 
-  return Response.json({ ok: true })
+  const data = await res.json()
+  return Response.json(data)
 }
