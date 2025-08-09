@@ -10,8 +10,8 @@ export default defineSchema({
 
   customers: defineTable({
     name: v.string(),
+    phone: v.string(),
     email: v.optional(v.string()),
-    created_at: v.string(),
   }),
 
   labels: defineTable({

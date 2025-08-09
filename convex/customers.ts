@@ -11,8 +11,8 @@ export const list = query({
 export const create = mutation({
   args: v.object({
     name: v.string(),
+    phone: v.string(),
     email: v.optional(v.string()),
-    created_at: v.string(),
   }),
   handler: async (ctx, args) => {
     const _id = await ctx.db.insert("customers", args)
