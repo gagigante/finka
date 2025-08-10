@@ -66,7 +66,7 @@ export function TaskAttributes({
 
       <FacetedFilter
         title="Status"
-        options={statuses.map(s => ({ label: s.label, value: s.value }))}
+        options={statuses.map(s => ({ label: s.label, value: s.value, icon: s.icon }))}
         value={selectedStatus ? [selectedStatus] : []}
         onChange={selectedStatus => onChangeStatus(selectedStatus[0] as Status)}
         triggerIcon={<CheckCircle className="mr-2 h-4 w-4" />}

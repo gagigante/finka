@@ -4,8 +4,12 @@ import { v } from "convex/values"
 export const list = query({
   args: {},
   handler: async (ctx) => {
+    const authUser = await ctx.auth.getUserIdentity()
+    if (!authUser) {
+      throw new Error("Unauthorized")
+    }
+
     const query = ctx.db.query("customers");
-    
     return await query.collect();
   }
 })
@@ -17,6 +21,11 @@ export const create = mutation({
     email: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
+    const authUser = await ctx.auth.getUserIdentity()
+    if (!authUser) {
+      throw new Error("Unauthorized")
+    }
+
     const _id = await ctx.db.insert("customers", args)
     return { _id }
   }

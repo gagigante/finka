@@ -5,7 +5,7 @@ import { useMutation } from 'convex/react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Loader2 } from "lucide-react"
+import { Loader2, PlusCircle } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 import { api } from "../../convex/_generated/api"
@@ -64,17 +64,23 @@ export function CreateCustomerDialog() {
       form.reset()
     }}>
       <DialogTrigger asChild>
-        <Button size="sm">Cadastrar cliente</Button>
+        <Button size="sm" variant="outline">
+          <PlusCircle className="h-4 w-4" />
+          Cadastrar cliente
+        </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Cadastrar novo cliente</DialogTitle>
+
           <VisuallyHidden>
             <DialogDescription>
               Preencha os dados do cliente para cadastrá-lo no sistema.
             </DialogDescription>
           </VisuallyHidden>
         </DialogHeader>
+
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div>
             <Label 

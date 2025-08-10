@@ -23,7 +23,7 @@ export const create = mutation({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_token", (q) =>
+      .withIndex("tokenIdentifier", (q) =>
         q.eq("tokenIdentifier", authUser.tokenIdentifier),
       )
       .unique();
@@ -37,7 +37,7 @@ export const create = mutation({
     }
 
     return await ctx.db.insert("users", {
-      name: authUser.name ?? "Anonymous",
+      name: authUser.name ?? "Anônimo",
       tokenIdentifier: authUser.tokenIdentifier,
     });
   },
