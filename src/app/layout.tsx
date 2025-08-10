@@ -35,7 +35,7 @@ export default function RootLayout({
           <main className="flex w-screen h-screen max-w-screen max-h-screen overflow-hidden">
             {children}
           </main>
-          
+
           <Toaster />
         </Providers>
       </body>
