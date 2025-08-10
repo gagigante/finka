@@ -21,4 +21,6 @@ export const statuses = [
     label: "Cancelado",
     icon: CircleOff,
   },
-]
+] as const
+
+export type Status = (typeof statuses)[number]["value"]

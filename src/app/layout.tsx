@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { Providers } from "@/providers";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           <main className="flex w-screen h-screen max-w-screen max-h-screen overflow-hidden">
             {children}
           </main>
+          <Toaster />
         </body>
       </html>
     </Providers>

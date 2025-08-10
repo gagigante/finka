@@ -10,53 +10,22 @@ export const list = query({
 
 export const create = mutation({
   args: v.object({
-    id: v.string(),
     title: v.string(),
-    priority: v.string(),
-    status: v.string(),
+    description: v.optional(v.string()),
+    priority: v.optional(v.string()),
+    status: v.optional(v.string()),
     created_at: v.string(),
     updated_at: v.optional(v.string()),
     finished_at: v.optional(v.string()),
-    assign: v.optional(v.object({ id: v.string(), name: v.string(), avatar: v.optional(v.string()) })),
-    customer: v.optional(v.object({ id: v.string(), name: v.string() })),
-    labels: v.optional(v.array(v.object({ id: v.string(), name: v.string() }))),
-    attachments: v.optional(v.array(v.object({ storageId: v.optional(v.id("_storage")), filename: v.string(), size: v.number(), type: v.optional(v.string()) }))),
+    customersIds: v.array(v.id("customers")),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, { customersIds, ...args}) => {
     const docId = await ctx.db.insert("tasks", args)
+
+    for (const customerId of customersIds) {
+      await ctx.db.insert("tasks_customers", { taskId: docId, customerId });
+    }
+
     return { _id: docId }
-  }
-})
-
-export const assignResponsible = mutation({
-  args: v.object({
-    taskId: v.id("tasks"),
-    assign: v.object({ id: v.string(), name: v.string(), avatar: v.optional(v.string()) })
-  }),
-  handler: async (ctx, { taskId, assign }) => {
-    await ctx.db.patch(taskId, { assign })
-  }
-})
-
-export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.storage.generateUploadUrl()
-  }
-})
-
-export const attachFile = mutation({
-  args: v.object({
-    taskId: v.id("tasks"),
-    storageId: v.id("_storage"),
-    filename: v.string(),
-    size: v.number(),
-    type: v.optional(v.string()),
-  }),
-  handler: async (ctx, { taskId, storageId, filename, size, type }) => {
-    const task = await ctx.db.get(taskId)
-    if (!task) throw new Error("Task not found")
-    const next = [...(task.attachments ?? []), { storageId, filename, size, type }]
-    await ctx.db.patch(taskId, { attachments: next })
   }
 })
