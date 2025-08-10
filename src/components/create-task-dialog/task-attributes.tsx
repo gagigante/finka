@@ -3,11 +3,13 @@ import { ArrowUp, Building2, CheckCircle, UserCircle } from "lucide-react"
 import { FacetedFilter } from "@/components/faceted-filter"
 
 import { priorities } from "@/constants/priorities"
-import { type Status, statuses } from "@/constants/statuses"
 
+import { type Status, statuses } from "@/constants/statuses"
+import { type User } from "@/hooks/queries/users"
 import { type Customer } from "@/hooks/queries/customers"
 
 interface TaskAttributesProps {
+  users: User[]
   customers: Customer[]
   selectedAssignmentsIds: string[]
   selectedCustomersIds: string[]
@@ -20,6 +22,7 @@ interface TaskAttributesProps {
 }
 
 export function TaskAttributes({
+  users,
   customers,
   selectedAssignmentsIds,
   selectedCustomersIds,
@@ -35,7 +38,7 @@ export function TaskAttributes({
       <FacetedFilter
         title="Responsáveis"
         placeholder="Pesquisar pelo nome..."
-        options={[]}
+        options={users.map(u => ({ label: u.name, value: u._id }))}
         value={selectedAssignmentsIds}
         onChange={onChangeAssignments}
         triggerIcon={<UserCircle className="mr-2 h-4 w-4" />}
@@ -44,7 +47,7 @@ export function TaskAttributes({
       <FacetedFilter
         title="Clientes"
         placeholder="Pesquisar pelo nome..."
-        options={customers.map(c => ({ label: c.name, value: c._id! }))}
+        options={customers.map(c => ({ label: c.name, value: c._id }))}
         value={selectedCustomersIds}
         onChange={onChangeCustomers}
         triggerIcon={<Building2 className="mr-2 h-4 w-4" />}
