@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* tiptap */
+@import '../styles/_variables.scss';                                       
+@import '../styles/_keyframe-animations.scss';
+
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
