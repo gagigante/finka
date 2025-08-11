@@ -5,9 +5,13 @@ export function formatDate(date: Date) {
 }
 
 export function formatPhoneNumber(value: string): string {
+  if (!value) return ''
+  
   const digits = value.replace(/\D/g, '')
-
-  if (digits.length <= 2) {
+  
+  if (digits.length === 0) {
+    return ''
+  } else if (digits.length <= 2) {
     return `(${digits}`
   } else if (digits.length <= 7) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2)}`

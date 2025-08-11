@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 import { useRemoveCustomer } from "@/hooks/mutations/customers"
 
@@ -47,9 +48,15 @@ export function DeleteCustomerDialog({
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!isDeleting) {
+      onOpenChange(open)
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent showCloseButton={!isDeleting}>
         <DialogHeader>
           <DialogTitle>Excluir cliente</DialogTitle>
           <DialogDescription>
@@ -63,7 +70,8 @@ export function DeleteCustomerDialog({
             disabled={isDeleting}
             size="sm"
           >
-            {isDeleting ? "Excluindo..." : "Excluir"}
+            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Excluir
           </Button>
           <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isDeleting}>
             Cancelar

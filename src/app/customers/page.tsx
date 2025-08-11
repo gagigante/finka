@@ -1,33 +1,22 @@
 "use client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { useCustomers } from "@/hooks/queries/customers"
+
+import { AppHeader } from "@/components/app-header"
+import { CustomerTable } from "@/components/customer-table"
 
 export default function Page() {
   const { data: customers } = useCustomers()
 
   return (
-    <div className="flex flex-col gap-4 p-6 w-full">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Clientes</h1>
-        <Button asChild>
-          <Link href="/customers/create">Cadastrar cliente</Link>
-        </Button>
-      </div>
+    <div className="flex w-full max-w-[1366px] h-full mx-auto">
+      <div className="flex flex-1 flex-col space-y-8 p-8">
+        <AppHeader title="Clientes" description="Gerencie os clientes do sistema" />
 
-      <div className="rounded border divide-y">
-        {(customers ?? []).map((c) => (
-          <div key={(c as any)._id ?? c.id} className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium">{c.name}</p>
-              {c.email && <p className="text-sm text-muted-foreground">{c.email}</p>}
-            </div>
-          </div>
-        ))}
-        {(customers ?? []).length === 0 && (
-          <div className="p-8 text-center text-muted-foreground">Nenhum cliente cadastrado.</div>
-        )}
+        <CustomerTable.Root data={customers}>
+          <CustomerTable.Toolbar />
+          <CustomerTable.DataTable />
+        </CustomerTable.Root>
       </div>
     </div>
   )
