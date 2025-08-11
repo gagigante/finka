@@ -1,14 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation } from 'convex/react'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Loader2, PlusCircle } from "lucide-react"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-import { api } from "../../convex/_generated/api"
+import { useCreateCustomer } from "@/hooks/mutations/customers"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,7 +33,7 @@ type CreateCustomerForm = z.infer<typeof createCustomerSchema>
 
 export function CreateCustomerDialog() {
   const [open, setOpen] = useState(false)
-  const createCustomer = useMutation(api.customers.create)
+  const { createCustomerMutation } = useCreateCustomer()
 
   const form = useForm<CreateCustomerForm>({
     resolver: zodResolver(createCustomerSchema),
@@ -53,7 +52,7 @@ export function CreateCustomerDialog() {
       email: email || undefined
     }
 
-    await createCustomer(payload)
+    await createCustomerMutation(payload)
     form.reset()
     setOpen(false)
   }
@@ -70,7 +69,7 @@ export function CreateCustomerDialog() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] !top-[12vh] !translate-y-0">
         <DialogHeader>
           <DialogTitle>Cadastrar novo cliente</DialogTitle>
 
@@ -83,29 +82,15 @@ export function CreateCustomerDialog() {
 
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div>
-            <Label 
-              htmlFor="name" 
-              className={form.formState.errors.name ? "text-red-500" : ""}
-            >
-              Nome
-            </Label>
+            <Label htmlFor="name">Nome</Label>
             <Input 
               id="name"
               {...form.register("name")} 
               className="mt-2"
-              aria-invalid={!!form.formState.errors.name}
             />
-            {form.formState.errors.name && (
-              <p className="text-sm text-red-500 mt-1">{form.formState.errors.name.message}</p>
-            )}
           </div>
           <div>
-            <Label 
-              htmlFor="phone"
-              className={form.formState.errors.phone ? "text-red-500" : ""}
-            >
-              Telefone
-            </Label>
+            <Label htmlFor="phone">Telefone</Label>
             <Input
               id="phone"
               type="tel" 
@@ -119,32 +104,21 @@ export function CreateCustomerDialog() {
                 }
               })}
               maxLength={15}
-              aria-invalid={!!form.formState.errors.phone}
             />
-            {form.formState.errors.phone && (
-              <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
-            )}
           </div>
           <div>
-            <Label 
-              htmlFor="email"
-              className={form.formState.errors.email ? "text-red-500" : ""}
-            >
-              Email <span className="text-muted-foreground font-normal text-xs">(opcional)</span>
+            <Label htmlFor="email">
+              E-mail <span className="text-muted-foreground font-normal text-xs">(opcional)</span>
             </Label>
             <Input 
               id="email"
               type="email" 
               {...form.register("email")} 
               className="mt-2"
-              aria-invalid={!!form.formState.errors.email}
             />
-            {form.formState.errors.email && (
-              <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
-            )}
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="submit" size="sm" disabled={form.formState.isSubmitting}>
+            <Button type="submit" size="sm" disabled={form.formState.isSubmitting || !form.formState.isValid}>
               {form.formState.isSubmitting && (
                 <Loader2 className="animate-spin w-4 h-4 mr-2" />
               )}
