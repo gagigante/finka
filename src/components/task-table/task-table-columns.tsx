@@ -74,6 +74,11 @@ export const columns: ColumnDef<Task>[] = [
         </div>
       )
     },
+    filterFn: (row, id, value) => {
+      const customers = row.getValue(id) as Task["customers"]
+      if (!customers) return false
+      return customers.some(customer => value.includes(customer.id))
+    },
     enableSorting: false,
   },
   {

@@ -33,10 +33,6 @@ export function TaskTableProvider({ children, data }: TaskTableProviderProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  useEffect(() => {
-    console.log({ columnFilters })
-  }, [columnFilters])
-
   const table = useReactTable({
     data,
     columns,
