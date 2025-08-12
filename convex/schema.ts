@@ -16,8 +16,8 @@ export default defineSchema({
   tasks: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
-    priority: v.optional(v.string()),
-    status: v.optional(v.string()),
+    priority: v.optional(v.union(v.string(), v.null())),
+    status: v.optional(v.union(v.string(), v.null())),
     created_at: v.string(),
     updated_at: v.optional(v.string()),
     finished_at: v.optional(v.string()),

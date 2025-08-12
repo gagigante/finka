@@ -1,4 +1,10 @@
-import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Minus } from "lucide-react";
+
+export const emptyPriority = {
+  label: "N/A",
+  value: null,
+  icon: Minus,
+}
 
 export const priorities = [
   {

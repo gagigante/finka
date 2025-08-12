@@ -13,7 +13,7 @@ interface TaskAttributesProps {
   customers: Customer[]
   selectedAssignmentsIds: string[]
   selectedCustomersIds: string[]
-  selectedPriority: string | undefined
+  selectedPriority: string | null
   selectedStatus: Status | undefined
   onChangeAssignments: (ids: string[]) => void
   onChangeCustomers: (ids: string[]) => void
