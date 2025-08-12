@@ -6,7 +6,6 @@
 // import { taskSchema } from "@/schemas/task-schema";
 import { HomeHeader } from "@/components/home-header";
 import { useTasks } from "@/hooks/queries/tasks";
-import { useTasksMutations } from '@/hooks/mutations/tasks'
 import { DataTable } from "@/components/data-table";
 
 import { TaskTable } from "@/components/task-table";
@@ -25,7 +24,6 @@ import { TaskTable } from "@/components/task-table";
 
 export default function Home() {
   const { data } = useTasks()
-  const { addTodoMutation } = useTasksMutations()
 
   return (
     <div className="flex w-full max-w-[1366px] h-full mx-auto">
@@ -36,12 +34,6 @@ export default function Home() {
           <TaskTable.Toolbar />
           <DataTable />
         </TaskTable.Root>
-
-        <button onClick={async () => {
-          await addTodoMutation.mutateAsync()
-        }}>add</button>
-
-        
       </div>
     </div>
   );

@@ -1,0 +1,135 @@
+"use client"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { Loader2, PlusCircle } from "lucide-react"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
+import { useCreateCustomer } from "@/hooks/mutations/customers"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import { formatPhoneNumber } from "@/utils/formatters"
+
+const createCustomerSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  phone: z.string().min(1, "Telefone é obrigatório"),
+  email: z.union([z.email("E-mail inválido"), z.string().length(0)]).optional(),
+})
+
+type CreateCustomerForm = z.infer<typeof createCustomerSchema>
+
+export function CreateCustomerDialog() {
+  const [open, setOpen] = useState(false)
+  const { createCustomerMutation } = useCreateCustomer()
+
+  const form = useForm<CreateCustomerForm>({
+    resolver: zodResolver(createCustomerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+    }
+  })
+
+  async function handleSubmit({name, phone, email}: CreateCustomerForm) {
+    const rawPhone = phone.replace(/\D/g, "")
+    const payload = {
+      name,
+      phone: rawPhone,
+      email: email || undefined
+    }
+
+    await createCustomerMutation(payload)
+    form.reset()
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(open) => {
+      setOpen(open)
+      form.reset()
+    }}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">
+          <PlusCircle className="h-4 w-4" />
+          Cadastrar cliente
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[425px] !top-[12vh] !translate-y-0">
+        <DialogHeader>
+          <DialogTitle>Cadastrar novo cliente</DialogTitle>
+
+          <VisuallyHidden>
+            <DialogDescription>
+              Preencha os dados do cliente para cadastrá-lo no sistema.
+            </DialogDescription>
+          </VisuallyHidden>
+        </DialogHeader>
+
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nome</Label>
+            <Input 
+              id="name"
+              {...form.register("name")} 
+              className="mt-2"
+            />
+          </div>
+          <div>
+            <Label htmlFor="phone">Telefone</Label>
+            <Input
+              id="phone"
+              type="tel" 
+              className="mt-2"
+              placeholder="(11) 99999-9999"
+              {...form.register("phone", {
+                onChange: (e) => {
+                  const formatted = formatPhoneNumber(e.target.value)
+                  e.target.value = formatted
+                  form.setValue("phone", formatted)
+                }
+              })}
+              maxLength={15}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">
+              E-mail <span className="text-muted-foreground font-normal text-xs">(opcional)</span>
+            </Label>
+            <Input 
+              id="email"
+              type="email" 
+              {...form.register("email")} 
+              className="mt-2"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="submit" size="sm" disabled={form.formState.isSubmitting || !form.formState.isValid}>
+              {form.formState.isSubmitting && (
+                <Loader2 className="animate-spin w-4 h-4 mr-2" />
+              )}
+              Criar cliente
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
