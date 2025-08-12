@@ -1,4 +1,10 @@
-import { CheckCircle, Circle, CircleOff, Timer } from "lucide-react";
+import { CheckCircle, Circle, CircleDashed, CircleOff, Timer } from "lucide-react";
+
+export const emptyStatus = {
+  label: "N/A",
+  value: null,
+  icon: CircleDashed,
+}
 
 export const statuses = [
   {

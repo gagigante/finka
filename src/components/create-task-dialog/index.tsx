@@ -42,14 +42,15 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
   const [selectedAssignmentsIds, setSelectedAssignmentsIds] = useState<string[]>([])
   const [selectedCustomersIds, setSelectedCustomersIds] = useState<string[]>([])
   const [selectedStatus, setSelectedStatus] = useState<Status>(statuses[0].value)
-  const [selectedPriority, setSelectedPriority] = useState<string>()
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null)
 
   function resetFields() {
     setTitle("")
     setDescription("")
+    setSelectedAssignmentsIds([])
     setSelectedCustomersIds([])
     setSelectedStatus(statuses[0].value)
-    setSelectedPriority(undefined)
+    setSelectedPriority(null)
   }
 
   async function handleSubmit() {

@@ -44,3 +44,36 @@ export const create = mutation({
     return { _id: docId }
   }
 })
+
+export const remove = mutation({
+  args: v.object({
+    _id: v.id("tasks"),
+  }),
+  handler: async (ctx, args) => {
+    const authUser = await ctx.auth.getUserIdentity()
+    if (!authUser) {
+      throw new Error("Unauthorized")
+    }
+
+    const taskCustomerRelations = await ctx.db
+      .query("tasks_customers")
+      .withIndex("taskId", q => q.eq("taskId", args._id))
+      .collect();
+    
+    for (const relation of taskCustomerRelations) {
+      await ctx.db.delete(relation._id);
+    }
+    
+    const taskUserRelations = await ctx.db
+      .query("tasks_users")
+      .withIndex("taskId", q => q.eq("taskId", args._id))
+      .collect();
+    
+    for (const relation of taskUserRelations) {
+      await ctx.db.delete(relation._id);
+    }
+
+    await ctx.db.delete(args._id);
+  }
+})
+

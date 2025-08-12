@@ -1,119 +1,134 @@
 import { type ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useUpdateTask } from "@/hooks/mutations/tasks";
+
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DataTableRowActions } from "../data-table/data-table-row-actions";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { AvatarGroup } from "./avatar-group";
 
 import { Task } from "@/schemas/task-schema";
 
 import { formatDate } from "@/utils/formatters";
 
-import { priorities } from "@/constants/priorities";
-import { statuses } from "@/constants/statuses";
+import { emptyPriority, priorities } from "@/constants/priorities";
+import { emptyStatus, statuses } from "@/constants/statuses";
+
+import { type Id } from "../../../convex/_generated/dataModel";
 
 export const columns: ColumnDef<Task>[] = [
   {
-    accessorKey: "assign",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Responsável" />
-    ),
-    cell: ({ getValue }) => {
-      const assign = getValue<Task["assign"]>()
-
+    accessorKey: "title",
+    header: ({ column }) => {
       return (
-        <div className="flex justify-start px-2">
-          {!!assign ? (
-            <Tooltip>
-              <TooltipTrigger>
-                <Avatar className="h-6 w-6">
-                  {assign.avatar && <AvatarImage src={assign.avatar} alt={assign.name} />}
-                  <AvatarFallback>{assign.name[0]}</AvatarFallback>
-                </Avatar>
-              </TooltipTrigger>
-              <TooltipContent>
-                {assign.name}
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <span className="font-medium">
-              N/A
-            </span>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Título
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       )
-    },
-    filterFn: (row, id, value) => {
-      const assign = row.getValue(id) as Task["assign"]
-      return value.includes(assign?.id)
-    },
-  },
-  { 
-    accessorKey: "labels",
-    filterFn: (row, id, value) => {
-      const labels = row.getValue(id) as Task["labels"]
-      return value.includes(labels)
     },
   },
   {
-    accessorKey: "title",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Título" />,
+    accessorKey: "users",
+    header: "Responsáveis",
     cell: ({ row }) => {
-      const labels = row.getValue("labels") as Task["labels"]
-
+      const users = row.original.users || []
+      
       return (
-        <div className="flex flex-col space-y-2 max-w-[420px]">
-          <span className=" truncate font-medium">
-            {row.getValue("title")}
-          </span>
-
-          {labels?.length > 0 && (
-            <div className="flex gap-1 flex-wrap">
-              {labels.map(label => (
-                <Badge key={label.id} variant="outline">{label.name}</Badge>
-              ))}
-            </div>
-          )}
+        <div className="flex items-center px-2">
+          <AvatarGroup 
+            items={users} 
+            max={3} 
+            emptyText="N/A" 
+            tooltipTitle="Outros responsáveis" 
+          />
         </div>
       )
-    },    
+    },
+    filterFn: (row, id, value) => {
+      const users = row.getValue(id) as Task["users"]
+      if (!users) return false
+      return users.some(user => value.includes(user.id))
+    },
     enableSorting: false,
   },
   {
-    accessorKey: "customer",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
-    cell: ({ row }) => (
-      <span className="truncate font-medium">
-        {(row.getValue("customer") as Task['customer'])?.name ?? 'N/A'}
-      </span>
-    ),    
+    accessorKey: "customers",
+    header: "Clientes",
+    cell: ({ row }) => {
+      const customers = row.original.customers || []
+      
+      return (
+        <div className="flex items-center px-2">
+          <AvatarGroup 
+            items={customers} 
+            max={3} 
+            emptyText="N/A" 
+            tooltipTitle="Outros clientes" 
+          />
+        </div>
+      )
+    },
+    enableSorting: false,
   },
   {
     accessorKey: "priority",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Prioridade" />,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Prioridade
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
+      const { updateTaskMutation } = useUpdateTask()
+
+      async function handlePriorityChange(priority: string | null) {
+        await updateTaskMutation({
+          _id: row.original._id as Id<"tasks">,
+          priority,
+        })
+      }
+
       const priority = priorities.find(
         (priority) => priority.value === row.getValue("priority")
       )
-
-      if (!priority) {
-        return null
-      }
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center data-[state=open]:bg-muted">
-              <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-              <span>{priority.label}</span>
+              {priority ? (
+                <>
+                  <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span>{priority.label}</span>
+                </>
+              ): (
+                <>
+                  <emptyPriority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span>{emptyPriority.label}</span>
+                </>
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem key={emptyPriority.value} onClick={() => handlePriorityChange(emptyPriority.value)}>
+              <emptyPriority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+              {emptyPriority.label}
+            </DropdownMenuItem>
+            
             {priorities.map(priority => (
-              <DropdownMenuItem key={priority.value}>
+              <DropdownMenuItem key={priority.value} onClick={() => handlePriorityChange(priority.value)}>
                 <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                 {priority.label}
               </DropdownMenuItem>
@@ -128,9 +143,18 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "created_at",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data de abertura" />
-    ),
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Data de abertura
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <span className="truncate font-medium">
         {formatDate(new Date(row.getValue("created_at")))}
@@ -139,27 +163,57 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "status",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
+      const { updateTaskMutation } = useUpdateTask()
+
+      async function handleStatusChange(status: string | null) {
+        await updateTaskMutation({
+          _id: row.original._id as Id<"tasks">,
+          status,
+        })
+      }
+
       const status = statuses.find(
         (status) => status.value === row.getValue("status")
       )
-
-      if (!status) {
-        return null
-      }
 
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center data-[state=open]:bg-muted">
-              <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-              <span>{status.label}</span>
+              {status ? (
+                <>
+                  <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span>{status.label}</span>
+                </>
+              ) : (
+                <>
+                  <emptyStatus.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span>{emptyStatus.label}</span>
+                </>
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem key={emptyStatus.value} onClick={() => handleStatusChange(emptyStatus.value)}>
+              <emptyStatus.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+              {emptyStatus.label}
+            </DropdownMenuItem>
+
             {statuses.map(status => (
-              <DropdownMenuItem key={status.value}>
+              <DropdownMenuItem key={status.value} onClick={() => handleStatusChange(status.value)}>
                 <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                 {status.label}
               </DropdownMenuItem>
@@ -175,6 +229,8 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => {
+      return <DataTableRowActions row={row} />
+    },
   },
 ];
