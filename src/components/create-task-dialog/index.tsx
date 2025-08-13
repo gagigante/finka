@@ -72,7 +72,7 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
       resetFields()
       onOpenChange(false)
       toast.success("Tarefa criada com sucesso!")
-    } catch (error) {
+    } catch {
       toast.error("Houve um erro ao criar a tarefa. Tente novamente.")
     } finally {
       setIsSubmitting(false)

@@ -95,7 +95,7 @@ export const columns: ColumnDef<Task>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { updateTaskMutation } = useUpdateTask()
 
       async function handlePriorityChange(priority: string | null) {
@@ -180,7 +180,7 @@ export const columns: ColumnDef<Task>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { updateTaskMutation } = useUpdateTask()
 
       async function handleStatusChange(status: string | null) {
@@ -234,7 +234,7 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       return <DataTableRowActions row={row} />
     },
   },

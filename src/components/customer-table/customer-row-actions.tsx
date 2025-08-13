@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, Trash } from "lucide-react"
+import { Trash } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,11 +15,9 @@ import { type Customer } from "@/hooks/queries/customers"
 
 interface CustomerRowActionsProps {
   customer: Customer
-  onView?: (customer: Customer) => void
-  onEdit?: (customer: Customer) => void
 }
 
-export function CustomerRowActions({ customer, onView, onEdit }: CustomerRowActionsProps) {
+export function CustomerRowActions({ customer }: CustomerRowActionsProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   
   return (

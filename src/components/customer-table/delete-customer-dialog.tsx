@@ -41,7 +41,7 @@ export function DeleteCustomerDialog({
       await removeCustomerMutation({ _id: customer._id as Id<"customers"> })
       onOpenChange(false)
       toast.success("Cliente excluído com sucesso")
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir cliente. Tente novamente.")
     } finally {
       setIsDeleting(false)

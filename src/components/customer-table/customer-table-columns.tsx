@@ -3,15 +3,15 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 
+import { useUpdateCustomer } from "@/hooks/mutations/customers"
+
 import { Button } from "@/components/ui/button"
 import { CustomerRowActions } from "./customer-row-actions"
 import { EditableCell } from "./editable-cell"
 import { EditablePhoneCell } from "./editable-phone-cell"
 
 import { type Customer } from "@/hooks/queries/customers"
-import { formatPhoneNumber } from "@/utils/formatters"
-import { useUpdateCustomer } from "@/hooks/mutations/customers"
-import { Id } from "../../../convex/_generated/dataModel"
+import { type Id } from "../../../convex/_generated/dataModel"
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -28,7 +28,7 @@ export const columns: ColumnDef<Customer>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { updateCustomerMutation } = useUpdateCustomer()
       const value = row.getValue("name") as string
       
@@ -59,7 +59,7 @@ export const columns: ColumnDef<Customer>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { updateCustomerMutation } = useUpdateCustomer()
       const value = row.getValue("email") as string || ""
       
@@ -79,7 +79,7 @@ export const columns: ColumnDef<Customer>[] = [
   {
     accessorKey: "phone",
     header: "Telefone",
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { updateCustomerMutation } = useUpdateCustomer()
       const value = row.getValue("phone") as string
       

@@ -43,6 +43,7 @@ export function CustomerTableProvider({ children, data }: CustomerTableProviderP
     <div className="space-y-4">
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           return React.cloneElement(child, { table } as any)
         }
         return child

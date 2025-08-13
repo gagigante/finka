@@ -83,7 +83,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
 
       onOpenChange(false)
       toast.success("Tarefa atualizada com sucesso!")
-    } catch (error) {
+    } catch {
       toast.error("Houve um erro ao atualizar a tarefa. Tente novamente.")
     } finally {
       setIsSubmitting(false)

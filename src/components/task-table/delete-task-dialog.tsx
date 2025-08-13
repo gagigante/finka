@@ -60,7 +60,7 @@ export function DeleteTaskDialog({
         <DialogHeader>
           <DialogTitle>Excluir tarefa</DialogTitle>
           <DialogDescription>
-            Tem certeza que deseja excluir a tarefa "{task?.title}"? Esta ação não pode ser desfeita.
+            Tem certeza que deseja excluir a tarefa &quot;{task?.title}&quot;? Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

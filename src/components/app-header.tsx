@@ -1,5 +1,5 @@
-import { Authenticated, Unauthenticated } from 'convex/react'
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { Authenticated } from 'convex/react'
+import { UserButton } from "@clerk/nextjs";
 
 interface AppHeaderProps {
   title: string

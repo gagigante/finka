@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { PlusCircle, UserCircle, Tag, X } from "lucide-react";
+import { PlusCircle, UserCircle, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
