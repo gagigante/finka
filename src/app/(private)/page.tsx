@@ -1,7 +1,5 @@
 'use client'
 
-import { Authenticated } from "convex/react";
-
 import { useTasks } from "@/hooks/queries/tasks";
 import { useStoreUserEffect } from "@/hooks/use-store-user-effect";
 
@@ -30,8 +28,6 @@ function Content() {
 
 export default function Home() {
   return (
-    <Authenticated>
-      <Content />
-    </Authenticated>
+    <Content />
   );
 }

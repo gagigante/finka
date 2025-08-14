@@ -11,8 +11,7 @@
     "convex:codegen": "convex codegen"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.12.4",
-    "@convex-dev/react-query": "0.0.0-alpha.11",
+    "@clerk/nextjs": "^6.30.2",
     "@floating-ui/react": "^0.27.15",
     "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-avatar": "^1.1.3",
