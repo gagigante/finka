@@ -21,6 +21,14 @@ export default defineSchema({
     created_at: v.string(),
     updated_at: v.optional(v.string()),
     finished_at: v.optional(v.string()),
+    files: v.optional(v.array(v.object({
+      id: v.string(),
+      name: v.string(),
+      url: v.string(),
+      size: v.number(),
+      type: v.string(),
+      uploadedAt: v.string(),
+    }))),
   }).index("by_status", ["status"]).index("by_created_at", ["created_at"]),
 
   tasks_users: defineTable({
