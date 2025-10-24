@@ -14,6 +14,15 @@ export interface Customer {
   name: string;
 }
 
+export interface TaskFile {
+  id: string;
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+}
+
 export interface Task {
   _id: string;
   title: string;
@@ -27,4 +36,5 @@ export interface Task {
   // Additional fields for all related users and customers
   users?: User[];
   customers?: Customer[];
+  files?: TaskFile[];
 }

@@ -11,6 +11,8 @@
     "convex:codegen": "convex codegen"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.916.0",
+    "@aws-sdk/s3-request-presigner": "^3.916.0",
     "@clerk/nextjs": "^6.30.2",
     "@floating-ui/react": "^0.27.15",
     "@hookform/resolvers": "^5.2.1",

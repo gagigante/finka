@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { useUsers } from "@/hooks/queries/users"
 import { useCustomers } from "@/hooks/queries/customers"
 import { useCreateTask } from "@/hooks/mutations/tasks"
+import { useFileUpload, FileToUpload } from "@/hooks/mutations/files"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { TaskDescriptionRichText } from "./task-description-rich-text"
 import { TaskAttributes } from "./task-attributes"
+import { FileUploadArea } from "@/components/file-upload/file-upload-area"
 
 import { type Id } from "../../../convex/_generated/dataModel"
 
@@ -35,6 +37,7 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
   const { createTaskMutation } = useCreateTask()
   const { data: users } = useUsers()
   const { data: customers } = useCustomers()
+  const { uploadFile, isUploading } = useFileUpload()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [title, setTitle] = useState("")
@@ -43,6 +46,7 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
   const [selectedCustomersIds, setSelectedCustomersIds] = useState<string[]>([])
   const [selectedStatus, setSelectedStatus] = useState<Status>(statuses[0].value)
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null)
+  const [filesToUpload, setFilesToUpload] = useState<FileToUpload[]>([])
 
   function resetFields() {
     setTitle("")
@@ -51,13 +55,15 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
     setSelectedCustomersIds([])
     setSelectedStatus(statuses[0].value)
     setSelectedPriority(null)
+    setFilesToUpload([])
   }
 
   async function handleSubmit() {
     setIsSubmitting(true)
 
     try {
-      await createTaskMutation({
+      // First create the task
+      const { _id } = await createTaskMutation({
         title,
         description,
         customersIds: selectedCustomersIds as Id<"customers">[],
@@ -69,10 +75,20 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
         finished_at: selectedStatus === "done" ? new Date().toISOString() : undefined,
       })
 
+      // Then upload files if any
+      if (filesToUpload.length > 0) {
+        const uploadPromises = filesToUpload.map(fileToUpload => 
+          uploadFile(fileToUpload, _id as Id<"tasks">)
+        )
+        
+        await Promise.all(uploadPromises)
+      }
+
       resetFields()
       onOpenChange(false)
       toast.success("Tarefa criada com sucesso!")
-    } catch {
+    } catch (error) {
+      console.error("Error creating task:", error)
       toast.error("Houve um erro ao criar a tarefa. Tente novamente.")
     } finally {
       setIsSubmitting(false)
@@ -119,6 +135,20 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
               />
             </div>
           </div>
+
+          <div>
+            <Label className="text-sm font-medium">
+              Arquivos <span className="text-muted-foreground font-normal text-xs">(opcional)</span>
+            </Label>
+            <div className="mt-2">
+              <FileUploadArea
+                files={filesToUpload}
+                onAddFiles={(newFiles) => setFilesToUpload(prev => [...prev, ...newFiles])}
+                onRemoveFile={(fileId) => setFilesToUpload(prev => prev.filter(f => f.id !== fileId))}
+                isUploading={isUploading}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="px-4 pt-4 border-t">
@@ -137,8 +167,12 @@ export function CreateTaskDialog({ open, onOpenChange }: CreateTaskDialogProps) 
         </div>
 
         <div className="flex justify-end gap-2 p-4">
-          <Button size="sm" disabled={isSubmitting || title === ""} onClick={handleSubmit}>
-            {isSubmitting && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
+          <Button 
+            size="sm" 
+            disabled={isSubmitting || isUploading || title === ""} 
+            onClick={handleSubmit}
+          >
+            {(isSubmitting || isUploading) && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
             Criar tarefa
           </Button>
 

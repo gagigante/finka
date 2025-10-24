@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { useUsers } from "@/hooks/queries/users"
 import { useCustomers } from "@/hooks/queries/customers"
 import { useUpdateTask } from "@/hooks/mutations/tasks"
+import { useFileUpload, FileToUpload } from "@/hooks/mutations/files"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/dialog"
 import { TaskDescriptionRichText } from "../create-task-dialog/task-description-rich-text"
 import { TaskAttributes } from "../create-task-dialog/task-attributes"
+import { FileUploadArea } from "@/components/file-upload/file-upload-area"
+import { FileList } from "@/components/file-upload/file-list"
 
 import { type Id } from "../../../convex/_generated/dataModel"
 import { Task } from "@/schemas/task-schema"
@@ -36,6 +39,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
   const { updateTaskMutation } = useUpdateTask()
   const { data: users } = useUsers()
   const { data: customers } = useCustomers()
+  const { uploadFile, removeFile, isUploading } = useFileUpload()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [title, setTitle] = useState(task.title)
@@ -52,6 +56,9 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
   const [selectedPriority, setSelectedPriority] = useState<string | null>(
     task.priority || null
   )
+  const [filesToUpload, setFilesToUpload] = useState<FileToUpload[]>([])
+  const [existingFiles, setExistingFiles] = useState(task.files || [])
+  const [removingFileId, setRemovingFileId] = useState<string | null>(null)
 
   // Update state when task changes
   useEffect(() => {
@@ -62,13 +69,41 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
       setSelectedCustomersIds(task.customers?.map(customer => customer.id) || [])
       setSelectedStatus(task.status as Status)
       setSelectedPriority(task.priority || null)
+      setExistingFiles(task.files || [])
+      setFilesToUpload([])
     }
   }, [task])
+
+  const handleRemoveFile = async (fileId: string) => {
+    try {
+      setRemovingFileId(fileId)
+      await removeFile(
+        task._id as Id<"tasks">,
+        fileId,
+        {
+          onSuccess: () => {
+            // Update local state
+            setExistingFiles(prev => prev.filter(file => file.id !== fileId))
+            toast.success("Arquivo removido com sucesso!")
+          },
+          onError: () => {
+            toast.error("Erro ao remover arquivo. Tente novamente.")
+          }
+        }
+      )
+    } catch (error) {
+      console.error("Error removing file:", error)
+      toast.error("Erro ao remover arquivo. Tente novamente.")
+    } finally {
+      setRemovingFileId(null)
+    }
+  }
 
   async function handleSubmit() {
     setIsSubmitting(true)
 
     try {
+      // First update the task
       await updateTaskMutation({
         _id: task._id as Id<"tasks">,
         title,
@@ -79,11 +114,22 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
         status: selectedStatus,
         updated_at: new Date().toISOString(),
         finished_at: selectedStatus === "done" ? new Date().toISOString() : undefined,
+        files: existingFiles.length > 0 ? existingFiles : undefined,
       })
+
+      // Then upload any new files
+      if (filesToUpload.length > 0) {
+        const uploadPromises = filesToUpload.map(fileToUpload => 
+          uploadFile(fileToUpload, task._id as Id<"tasks">)
+        )
+        
+        await Promise.all(uploadPromises)
+      }
 
       onOpenChange(false)
       toast.success("Tarefa atualizada com sucesso!")
-    } catch {
+    } catch (error) {
+      console.error("Error updating task:", error)
       toast.error("Houve um erro ao atualizar a tarefa. Tente novamente.")
     } finally {
       setIsSubmitting(false)
@@ -125,6 +171,33 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
               />
             </div>
           </div>
+
+          <div>
+            <Label className="text-sm font-medium">
+              Arquivos <span className="text-muted-foreground font-normal text-xs">(opcional)</span>
+            </Label>
+            
+            {/* Display existing files */}
+            {existingFiles.length > 0 && (
+              <FileList
+                files={existingFiles}
+                onRemoveFile={handleRemoveFile}
+                isRemovingFile={!!removingFileId}
+                removingFileId={removingFileId || undefined}
+                className="mt-2 mb-4"
+              />
+            )}
+            
+            {/* Upload new files */}
+            <div className="mt-2">
+              <FileUploadArea
+                files={filesToUpload}
+                onAddFiles={(newFiles) => setFilesToUpload(prev => [...prev, ...newFiles])}
+                onRemoveFile={(fileId) => setFilesToUpload(prev => prev.filter(f => f.id !== fileId))}
+                isUploading={isUploading}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="px-4 pt-4 border-t">
@@ -143,8 +216,12 @@ export function TaskDetailsDialog({ task, open, onOpenChange }: TaskDetailsDialo
         </div>
 
         <div className="flex justify-end gap-2 p-4">
-          <Button size="sm" disabled={isSubmitting || title === ""} onClick={handleSubmit}>
-            {isSubmitting && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
+          <Button 
+            size="sm" 
+            disabled={isSubmitting || isUploading || !!removingFileId || title === ""} 
+            onClick={handleSubmit}
+          >
+            {(isSubmitting || isUploading) && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
             Salvar alterações
           </Button>
 
