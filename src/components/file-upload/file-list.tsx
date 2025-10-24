@@ -23,7 +23,7 @@ export function FileList({
   removingFileId,
   className
 }: FileListProps) {
-  const { downloadFile, generateDownloadUrl } = useFileDownload()
+  const { generateDownloadUrl } = useFileDownload()
   const [isDownloading, setIsDownloading] = useState<string | null>(null)
 
   const handleDownload = async (file: TaskFile) => {

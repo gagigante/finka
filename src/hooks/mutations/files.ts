@@ -5,17 +5,25 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 // Re-export API functions for type safety
-// Note: Using 'any' type here as a workaround until the Convex API types are generated
 const filesApi = {
-  generateUploadUrl: (api as any).files?.generateUploadUrl,
-  saveFileMetadata: (api as any).files?.saveFileMetadata,
-  generateDownloadUrl: (api as any).files?.generateDownloadUrl,
-  removeFile: (api as any).files?.removeFile,
-  deleteFileFromS3: (api as any).files?.deleteFileFromS3,
+  generateUploadUrl: api.files.generateUploadUrl,
+  saveFileMetadata: api.files.saveFileMetadata,
+  generateDownloadUrl: api.files.generateDownloadUrl,
+  removeFile: api.files.removeFile,
+  deleteFileFromS3: api.files.deleteFileFromS3,
 };
 
+export interface FileData {
+  id: string;
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+}
+
 export interface UploadFileOptions {
-  onSuccess?: (fileData: any) => void;
+  onSuccess?: (fileData: FileData) => void;
   onError?: (error: Error) => void;
 }
 
@@ -35,7 +43,7 @@ export function useFileUpload() {
     fileToUpload: FileToUpload,
     taskId?: Id<"tasks">,
     options?: UploadFileOptions
-  ) => {
+  ): Promise<FileData> => {
     const { file } = fileToUpload;
     
     try {
